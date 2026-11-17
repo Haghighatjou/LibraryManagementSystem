@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="../Library Management System/Library Management System.csproj" Id="973742fd-ff3a-4b73-96d7-192cd3be4bbf" />
+  <Project Path="../LibraryManagement.core/LibraryManagement.core.csproj" DisplayName="LibraryManagement.Core" Id="1060fe41-b8b9-4edd-b1d8-3f806608c597" />
+  <Project Path="../LibraryManagement.Tests/LibraryManagement.Tests.csproj" Id="b5c03cfa-2090-4889-89f0-b60c0d7640ae" />
+  <Project Path="LibraryManagementAPI.csproj" />
+</Solution>
