@@ -1,0 +1,29 @@
+name: .NET CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore API
+        run: dotnet restore LibraryManagementAPI/LibraryManagementAPI.csproj
+
+      - name: Build API
+        run: dotnet build LibraryManagementAPI/LibraryManagementAPI.csproj --no-restore
+
+      - name: Run Tests
+        run: dotnet test LibraryManagement.Tests/LibraryManagement.Tests.csproj

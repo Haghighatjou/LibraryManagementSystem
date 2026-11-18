@@ -3,6 +3,7 @@
 
 # Include solution projects
 !README.md
+!.github/
 !.gitignore
 !LibraryManagementAPI/
 !LibraryManagement.Core/
