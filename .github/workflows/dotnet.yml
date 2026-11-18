@@ -27,3 +27,12 @@ jobs:
 
       - name: Run Tests
         run: dotnet test LibraryManagement.Tests/LibraryManagement.Tests.csproj
+
+      - name: Publish API
+        run: dotnet publish LibraryManagementAPI/LibraryManagementAPI.csproj -c Release -o ./publish
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LibraryManagementAPI
+          path: ./publish
