@@ -1,6 +1,18 @@
-.vs/
-bin/
-obj/
-packages/
-*.user
-appsettings.Development.json
+# Ignore everything by default
+/*
+
+# Include solution projects
+!.gitignore
+!LibraryManagementAPI/
+!LibraryManagement.Core/
+!LibraryManagement.Tests/
+!Library Management System/
+
+# Ignore build and IDE files
+**/bin/
+**/obj/
+**/.vs/
+**/*.user
+**/*.suo
+**/packages/
+**/appsettings.Development.json
