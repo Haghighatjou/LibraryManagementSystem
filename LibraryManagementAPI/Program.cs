@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi;
 using Microsoft.AspNetCore.Diagnostics;
+using LibraryManagementAPI.Exceptions;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -80,40 +81,15 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 var app = builder.Build();
 
+app.UseExceptionHandler();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseExceptionHandler(errorApp =>
-{
-    errorApp.Run(async context =>
-    {
-        var exception = context.Features
-            .Get<IExceptionHandlerPathFeature>()?.Error;
-
-        var statusCode = exception switch
-        {
-            MemberNotFoundException => 404,
-            BookNotFoundException => 404,
-            MemberInactiveException => 400,
-            BookNotAvailableException => 400,
-            LastAdminCannotBeDemotedException => 409,
-            _ => 500
-        };
-
-        context.Response.StatusCode = statusCode;
-
-        await context.Response.WriteAsJsonAsync(new
-        {
-            message = exception?.Message ?? "An unexpected error occurred."
-        });
-    });
-});
-
-
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

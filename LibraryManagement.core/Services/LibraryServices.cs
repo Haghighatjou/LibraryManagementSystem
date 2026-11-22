@@ -2,6 +2,7 @@
 using LibraryManagement.Core.Models;
 using LibraryManagement.Core.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 
 
@@ -11,11 +12,12 @@ namespace LibraryManagement.Core.Services
     {
         
         private readonly LibraryDbContext context;
+        private readonly ILogger<LibraryService> logger;
 
-        public LibraryService(LibraryDbContext context)
-        {
-            
+        public LibraryService(LibraryDbContext context, ILogger<LibraryService> logger)
+        {            
             this.context = context;
+            this.logger = logger;
         }
 
         public async Task<List<Book>> GetBooksAsync()
@@ -30,6 +32,10 @@ namespace LibraryManagement.Core.Services
 
         public async Task AddBookAsync(Book book)
         {
+            logger.LogInformation(
+                "Add Book request received. Title: {Title}, Author: {Author}",
+                book.Title,book.Author);
+
             book.IsAvailable = true;
 
             await context.Books.AddAsync(book);
@@ -54,6 +60,9 @@ namespace LibraryManagement.Core.Services
 
         public async Task BorrowBookAsync(int bookId, int memberId)
         {
+            logger.LogInformation("Borrow request received for BookId: {BookId}", bookId);
+            logger.LogInformation("Borrow request received for MemberId: {MemberId}", memberId);
+
             await using var transaction =
                 await context.Database.BeginTransactionAsync();
 
@@ -78,6 +87,8 @@ namespace LibraryManagement.Core.Services
 
                 if(!bookExists)
                 {
+                    logger.LogWarning("Book not found. BookId:{BookId}", bookId);
+
                     throw new BookNotFoundException($"Book with Id {bookId} was not found.");
                 }
                 throw new BookNotAvailableException("Book is not available.");
@@ -101,6 +112,8 @@ namespace LibraryManagement.Core.Services
 
         public async Task ReturnBookAsync(int bookId)
         {
+            logger.LogInformation("Return request received for BookId: {BookId}", bookId);
+
             await using var transaction
                 =await context.Database.BeginTransactionAsync();
 
@@ -133,6 +146,8 @@ namespace LibraryManagement.Core.Services
 
         public async Task DeleteBookAsync(int bookId)
         {
+            logger.LogInformation("Delete Book received for BookId: {BookId}", bookId);
+
             var book = await GetBookByIdAsync(bookId);
 
             if (book == null)
@@ -173,12 +188,13 @@ namespace LibraryManagement.Core.Services
         
 
         public async Task<List<Member>> GetMembersAsync()
-        {
+        {            
             return await context.Members.ToListAsync();
         }
 
         public async Task UpdateMemberAsync(Member member)
         {
+            logger.LogInformation("Update Member request received for MemberId: {MemberId}", member.Id);
 
             if (member.MemberName == null && member.PhoneNumber == null)
             {
@@ -202,6 +218,8 @@ namespace LibraryManagement.Core.Services
 
         public async Task EnableMemberAsync(int memberId)
         {
+            logger.LogInformation("Enable Member request received for MemberId: {MemberId}", memberId);
+
             var existingMember=await FindMemberByIdAsync(memberId);
 
 
@@ -217,6 +235,8 @@ namespace LibraryManagement.Core.Services
 
         public async Task DisableMemberAsync(int memberId)
         {
+            logger.LogInformation("Disable Member request received for MemberId: {MemberId}", memberId);
+
             var existingMember = await FindMemberByIdAsync(memberId);
 
 
@@ -244,6 +264,8 @@ namespace LibraryManagement.Core.Services
 
         public async Task AddMemberAsync(string memberName,string phoneNumber)
         {
+            logger.LogInformation("Add Member request received");
+
             var member = new Member
             {
                 MemberName = memberName,

@@ -24,32 +24,10 @@ namespace LibraryManagementAPI.Controllers
         }
 
         [Authorize]
-        [HttpGet("ef-test")]
-        public async Task<IActionResult> GetBookWithEFCore ()
-        {
-            var books = await context.Books.ToListAsync();
-
-            return Ok(books);
-        }
-
-        [HttpPut("ef-test/{id}")]
-        public async Task<IActionResult> UpdateBookWithEFCore(int id)
-        {
-            var book = await context.Books.FindAsync(id);
-
-            if(book==null)
-            {
-                return NotFound();
-            }
-
-            book.Title = "EF Core test.";
-            await context.SaveChangesAsync();
-            return Ok(book);
-        }
-
         [HttpGet]
         public async Task<IActionResult> GetBooksAsync()
         {
+            
             var books = await LibraryService.GetBooksAsync();
 
             var bookDtos = books.Select(book => new BookDTO
@@ -63,8 +41,9 @@ namespace LibraryManagementAPI.Controllers
             return Ok(bookDtos);
         }
 
+        [Authorize]
         [HttpGet("{id}", Name ="GetBookById")]
-        public async Task<IActionResult> GetBookAsync(int id)
+        public async Task<IActionResult> GetBookByIdAsync(int id)
         {
             var book = await LibraryService.GetBookByIdAsync(id);
 
@@ -83,6 +62,7 @@ namespace LibraryManagementAPI.Controllers
             return Ok(bookDto);
         }
 
+        [Authorize]
         [HttpGet("search")]
         public async Task<IActionResult> SearchBookAsync([FromQuery] string title)
         {
@@ -104,6 +84,7 @@ namespace LibraryManagementAPI.Controllers
             return Ok(bookDto);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> AddBook(CreateBookDTO bookDto)
         {
@@ -120,6 +101,7 @@ namespace LibraryManagementAPI.Controllers
             //return Ok(book);
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBookAsync(int id, UpdateBookDTO bookDto)
         {
@@ -147,6 +129,7 @@ namespace LibraryManagementAPI.Controllers
             return Ok("Book deleted succussfully.");
         }
 
+        [Authorize]
         [HttpPost("{bookId}/borrow")]
         public async Task<IActionResult> BorrowBookAsync(int bookId,int memberId)
         {
@@ -163,6 +146,7 @@ namespace LibraryManagementAPI.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost("{id}/return")]
         public async Task<IActionResult> ReturnBookAsync(int id)
         {
@@ -171,6 +155,7 @@ namespace LibraryManagementAPI.Controllers
             return Ok("Book returned successfully.");
         }
 
+        [Authorize]
         [HttpGet ("active-loans")]
         public async Task<IActionResult> GetActiveLoanReportAsync()
         {

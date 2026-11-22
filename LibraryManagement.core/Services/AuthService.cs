@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using LibraryManagement.Core.Exceptions;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 
 
 
@@ -19,17 +20,22 @@ namespace LibraryManagement.core.Services
         private readonly LibraryDbContext context;
         private readonly IPasswordHasher<AppUser> passwordHasher;
         private readonly JwtService jwtService;
-
-        public AuthService(LibraryDbContext context, IPasswordHasher<AppUser> passwordHasher, JwtService jwtService)
+        private readonly ILogger<AuthService> logger;
+        public AuthService(
+            LibraryDbContext context, IPasswordHasher<AppUser> passwordHasher,
+            JwtService jwtService, ILogger<AuthService> logger)
         {
             this.context = context;
             this.passwordHasher = passwordHasher;
             this.jwtService = jwtService;
+            this.logger = logger;
         }
 
         public async Task RegisterAsync(string username,string password)
         {
-            if(await context.Users.AnyAsync(u => u.Username==username))
+            logger.LogInformation("Register request received for UserName: {UserName}", username);
+
+            if (await context.Users.AnyAsync(u => u.Username==username))
             {
                 throw new UserUnavailableException("This user before exist.");
             }
@@ -48,6 +54,8 @@ namespace LibraryManagement.core.Services
 
         public async Task<string?> LoginAsync(string username, string password)
         {
+            logger.LogInformation("Login request received for UserName: {UserName}", username);
+
             var user=await context.Users.FirstOrDefaultAsync(u => u.Username== username);
 
             if(user==null)
@@ -78,6 +86,8 @@ namespace LibraryManagement.core.Services
 
         public async Task<bool> UpdateUserRoleAsync(int userId,int requesterId, string role)
         {
+            logger.LogInformation("Update User Role request received for UserId: {UserId}", userId);
+
             var user = await context.Users.FindAsync(userId);
 
             if(user==null )
@@ -116,6 +126,8 @@ namespace LibraryManagement.core.Services
 
         public async Task<bool> DeleteUserAsync(int userId)
         {
+            logger.LogInformation("Delete User request received for UserId:{UserId}", userId);
+
             var user= await context.Users.FindAsync(userId);
 
             if(user==null)
