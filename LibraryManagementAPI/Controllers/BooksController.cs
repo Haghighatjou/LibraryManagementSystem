@@ -17,17 +17,22 @@ namespace LibraryManagementAPI.Controllers
     {
         public readonly LibraryService LibraryService;
         public readonly LibraryDbContext context;
-        public BooksController(LibraryService libraryService, LibraryDbContext context)
+        private readonly IConfiguration _configuration;
+        public BooksController(
+            LibraryService libraryService, LibraryDbContext context, IConfiguration configuration)
         {
             this.LibraryService = libraryService;
-            this.context= context;
+            this.context = context;
+            this._configuration = configuration;
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpGet]
         public async Task<IActionResult> GetBooksAsync()
         {
-            
+            var appName = _configuration["AppSettings:ApplicationName"];
+            Console.WriteLine($"Application Name: {appName}");
+
             var books = await LibraryService.GetBooksAsync();
 
             var bookDtos = books.Select(book => new BookDTO

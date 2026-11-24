@@ -16,6 +16,7 @@ using LibraryManagementAPI.Exceptions;
 
 
 var builder = WebApplication.CreateBuilder(args);
+Console.WriteLine(builder.Environment.EnvironmentName);
 
 // Add services to the container.
 

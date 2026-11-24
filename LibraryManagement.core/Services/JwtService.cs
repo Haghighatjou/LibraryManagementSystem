@@ -26,7 +26,7 @@ namespace LibraryManagement.core.Services
                 ?? throw new InvalidOperationException("JWT key is missing.");
 
             var issuer = jwtSettings["Issuer"];
-            var audiance = jwtSettings["Audience"];
+            var audience = jwtSettings["Audience"];
 
             var expirationMinutes = int.Parse(jwtSettings["ExpirationMinutes"] ?? "30");
 
@@ -43,7 +43,7 @@ namespace LibraryManagement.core.Services
 
             var token = new JwtSecurityToken(
                 issuer: issuer,
-                audience: audiance,
+                audience: audience,
                 claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(expirationMinutes), signingCredentials: credentials
                 );
