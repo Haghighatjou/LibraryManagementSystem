@@ -20,9 +20,35 @@ namespace LibraryManagement.Core.Services
             this.logger = logger;
         }
 
-        public async Task<List<Book>> GetBooksAsync()
-        {
-            return await context.Books.ToListAsync();
+        public async Task<PagedResult<Book>> GetBooksAsync(int pageNumber, int pageSize)
+        {            
+            if(pageNumber<=0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(pageNumber), "Page number must be greater than zero");
+            }
+
+            if(pageSize<=0 || pageSize>100)
+            {
+                throw new ArgumentOutOfRangeException(nameof(pageSize),
+                    "Page size must be between 1 and 100.");
+            }
+
+            var totalCount=await context.Books.CountAsync();
+            var totalPages=(int)Math.Ceiling((double)totalCount/pageSize);
+
+            return new PagedResult<Book>
+            {
+                Items = await context.Books
+                    .OrderBy(b => b.Id)
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync(),
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                TotalPages= totalPages
+            };
         }
 
         public async Task<Book?> GetBookByIdAsync(int id)

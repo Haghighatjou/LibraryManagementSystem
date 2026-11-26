@@ -26,24 +26,29 @@ namespace LibraryManagementAPI.Controllers
             this._configuration = configuration;
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpGet]
-        public async Task<IActionResult> GetBooksAsync()
+        public async Task<IActionResult> GetBooksAsync(int pageNumber=1,int pageSize=10)
         {
-            var appName = _configuration["AppSettings:ApplicationName"];
-            Console.WriteLine($"Application Name: {appName}");
+            
+            var books = await LibraryService.GetBooksAsync(pageNumber,pageSize);
 
-            var books = await LibraryService.GetBooksAsync();
-
-            var bookDtos = books.Select(book => new BookDTO
+            var pagedResultDTO = new PagedResultDTO
             {
-                Id = book.Id,
-                Title = book.Title,
-                Author = book.Author,
-                PublishYear = book.PublishYear
-            }).ToList();
+                Items = books.Items.Select(book => new BookDTO
+                {
+                    Id = book.Id,
+                    Title = book.Title,
+                    Author = book.Author,
+                    PublishYear = book.PublishYear
+                }).ToList(),
+                PageNumber= books.PageNumber,
+                PageSize=books.PageSize,
+                TotalCount=books.TotalCount,
+                TotalPages=books.TotalPages
+            };
 
-            return Ok(bookDtos);
+            return Ok(pagedResultDTO);
         }
 
         [Authorize]
